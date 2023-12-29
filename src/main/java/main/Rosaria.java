@@ -67,8 +67,6 @@ public class Rosaria {
                         executor.shutdownNow();
                     }
                 }
-
-                System.out.println("sheet is" + urlList);
             }
         }
 

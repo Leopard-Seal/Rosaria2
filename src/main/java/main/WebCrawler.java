@@ -21,13 +21,20 @@ public class WebCrawler {
         element.click();
 
         Login.login(driver);
+        int i = 0;
         for (String url : urls) {
-            driver.get(Fast.BASE_URL + url);
-            WebElement box = driver.findElement(By.className("common_left_box"));
-            String htmlContent = box.getAttribute("outerHTML");
-            String title = box.findElement(By.tagName("h1")).getText();
+            try{
+                driver.get(Fast.BASE_URL + url);
+                WebElement box = driver.findElement(By.className("common_left_box"));
+                String htmlContent = box.getAttribute("outerHTML");
+                String title = box.findElement(By.tagName("h1")).getText();
 
-            Datasets.add(new Data(title, htmlContent, Fast.BASE_URL + url));
+                Datasets.add(new Data(title, htmlContent, Fast.BASE_URL + url));
+            }catch (Exception e){
+                Datasets.saveJson("./data" + (System.currentTimeMillis() % 10000) + ".json");
+            }
+            System.out.println(i + " : "+url);
+            i++;
         }
     }
 }

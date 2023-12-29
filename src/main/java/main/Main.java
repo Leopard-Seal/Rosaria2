@@ -1,20 +1,18 @@
 package main;
 
 import global.Datasets;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.Save;
 
 public class Main {
     public static void main(String[] args) {
         Rosaria rosaria = new Rosaria();
         rosaria.run();
-        List<String> urlList = new ArrayList<>();
-        for (int i = 0 ; i < 12; i++){
-            urlList.add(Rosaria.urlList.get(i));
+        System.out.println(Rosaria.urlList.size());
+        Save.saveToFile(Rosaria.urlList , "./data/urllist.txt");
+        for (String url : Rosaria.urlList) {
+            System.out.println(url);
         }
-        System.out.println("List : " + urlList.size());
-        WebCrawler.run(urlList);
+        WebCrawler.run(Rosaria.urlList);
         Datasets.saveJson("./data/data.json");
     }
 }
