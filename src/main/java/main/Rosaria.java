@@ -13,61 +13,65 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Rosaria {
-    public static List<String> companies = new CopyOnWriteArrayList<>();
-    public static List<String> essearch = new CopyOnWriteArrayList<>();
-    public static List<String> sheets = new CopyOnWriteArrayList<>();
+    private static final List<String> companies = new CopyOnWriteArrayList<>();
+    private static final List<String> essearch = new CopyOnWriteArrayList<>();
+    public static List<String> urlList = new CopyOnWriteArrayList<>();
 
-    public static int THREADS = Runtime.getRuntime().availableProcessors() * 2;
+    public static final int THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
     public void run() {
         System.out.println(THREADS);
-        int index = 2;
+        int min = 2;
         int max = 37;
-        String url0 = Fast.FIRST_VISIT_URL + index;
 
-        //URLが存在するかどうか
-        if(!Security.isNotFound(url0)){
-            // まず、url0からリンクを会社のリンクを抜き出す
-            Document doc0 = new OpenHTML(url0).getDocument();
-            List<String> hrefs = HTMLAnalyzer.extractLinksFromClassName(doc0, "relation_companies");
-            companies.addAll(hrefs);
+        for (int index = min; index <= max; index++) {
+            String url0 = Fast.FIRST_VISIT_URL + index;
 
-            // スレッドプールの設定
-            try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)) {
-                // 各リンクに対して非同期処理を行う
-                for (String companyLink : companies) {
-                    executor.submit(() -> process1(companyLink));
-                }
+            //URLが存在するかどうか
+            if(!Security.isNotFound(url0)){
+                // まず、url0からリンクを会社のリンクを抜き出す
+                Document doc0 = new OpenHTML(url0).getDocument();
+                List<String> hrefs = HTMLAnalyzer.extractLinksFromClassName(doc0, "relation_companies");
+                companies.addAll(hrefs);
 
-                // エグゼキュータのシャットダウン処理
-                executor.shutdown();
-                try {
-                    if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                // スレッドプールの設定
+                try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)) {
+                    // 各リンクに対して非同期処理を行う
+                    for (String companyLink : companies) {
+                        executor.submit(() -> process1(companyLink));
+                    }
+
+                    // エグゼキュータのシャットダウン処理
+                    executor.shutdown();
+                    try {
+                        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                            executor.shutdownNow();
+                        }
+                    } catch (InterruptedException e) {
                         executor.shutdownNow();
                     }
-                } catch (InterruptedException e) {
-                    executor.shutdownNow();
-                }
-            }
-
-            try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)){
-                //シートのリンクから同じようにhrefを抜き出す。
-                for (String sheetLink : essearch) {
-                    executor.submit(() -> process2(sheetLink));
                 }
 
-                executor.shutdown();
-                try {
-                    if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)){
+                    //シートのリンクから同じようにhrefを抜き出す。
+                    for (String sheetLink : essearch) {
+                        executor.submit(() -> process2(sheetLink));
+                    }
+
+                    executor.shutdown();
+                    try {
+                        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                            executor.shutdownNow();
+                        }
+                    } catch (InterruptedException e) {
                         executor.shutdownNow();
                     }
-                } catch (InterruptedException e) {
-                    executor.shutdownNow();
                 }
-            }
 
-            System.out.println("sheet is" + sheets);
+                System.out.println("sheet is" + urlList);
+            }
         }
+
     }
 
     public static void process1(String url) {
@@ -84,6 +88,6 @@ public class Rosaria {
         OpenHTML openHTML = new OpenHTML(Fast.BASE_URL + url);
         Document doc = openHTML.getDocument();
         List<String> links = HTMLAnalyzer.extractLinksFromClassName(doc, "company_sheets");
-        sheets.addAll(links);
+        urlList.addAll(links);
     }
 }
