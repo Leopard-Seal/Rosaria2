@@ -31,7 +31,7 @@ public class WebCrawler {
 
                 Datasets.add(new Data(title, htmlContent, Fast.BASE_URL + url));
             }catch (Exception e){
-                Datasets.saveJson("./data" + (System.currentTimeMillis() % 10000) + ".json");
+                Datasets.saveJson("./data/data" + System.currentTimeMillis()  + ".json");
             }
             System.out.println(i + " : "+url);
             i++;

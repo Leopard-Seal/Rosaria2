@@ -5,14 +5,15 @@ import io.Save;
 
 public class Main {
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         Rosaria rosaria = new Rosaria();
-        rosaria.run();
+        int index = 4;
+        rosaria.run(index);
         System.out.println(Rosaria.urlList.size());
         Save.saveToFile(Rosaria.urlList , "./data/urllist.txt");
-        for (String url : Rosaria.urlList) {
-            System.out.println(url);
-        }
         WebCrawler.run(Rosaria.urlList);
-        Datasets.saveJson("./data/data.json");
+        Datasets.saveJson("./data/data-"+(index-1)+".json");
+        long end = System.currentTimeMillis();
+        System.out.println(end - start + "ms");
     }
 }

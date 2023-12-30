@@ -19,57 +19,56 @@ public class Rosaria {
 
     public static final int THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
-    public void run() {
+    public void run(int index) {
         System.out.println(THREADS);
-        int min = 2;
         int max = 37;
+        int min = 2;
 
-        for (int index = min; index <= max; index++) {
-            String url0 = Fast.FIRST_VISIT_URL + index;
+        String url0 = Fast.FIRST_VISIT_URL + index;
 
-            //URLが存在するかどうか
-            if(!Security.isNotFound(url0)){
-                // まず、url0からリンクを会社のリンクを抜き出す
-                Document doc0 = new OpenHTML(url0).getDocument();
-                List<String> hrefs = HTMLAnalyzer.extractLinksFromClassName(doc0, "relation_companies");
-                companies.addAll(hrefs);
+        //URLが存在するかどうか
+        if(!Security.isNotFound(url0)){
+            // まず、url0からリンクを会社のリンクを抜き出す
+            Document doc0 = new OpenHTML(url0).getDocument();
+            List<String> hrefs = HTMLAnalyzer.extractLinksFromClassName(doc0, "relation_companies");
+            companies.addAll(hrefs);
 
-                // スレッドプールの設定
-                try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)) {
-                    // 各リンクに対して非同期処理を行う
-                    for (String companyLink : companies) {
-                        executor.submit(() -> process1(companyLink));
-                    }
-
-                    // エグゼキュータのシャットダウン処理
-                    executor.shutdown();
-                    try {
-                        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                            executor.shutdownNow();
-                        }
-                    } catch (InterruptedException e) {
-                        executor.shutdownNow();
-                    }
+            // スレッドプールの設定
+            try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)) {
+                // 各リンクに対して非同期処理を行う
+                for (String companyLink : companies) {
+                    executor.submit(() -> process1(companyLink));
                 }
 
-                try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)){
-                    //シートのリンクから同じようにhrefを抜き出す。
-                    for (String sheetLink : essearch) {
-                        executor.submit(() -> process2(sheetLink));
-                    }
-
-                    executor.shutdown();
-                    try {
-                        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                            executor.shutdownNow();
-                        }
-                    } catch (InterruptedException e) {
+                // エグゼキュータのシャットダウン処理
+                executor.shutdown();
+                try {
+                    if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
                         executor.shutdownNow();
                     }
+                } catch (InterruptedException e) {
+                    executor.shutdownNow();
                 }
             }
-        }
 
+            try (ExecutorService executor = Executors.newFixedThreadPool(THREADS)){
+                //シートのリンクから同じようにhrefを抜き出す。
+                for (String sheetLink : essearch) {
+                    executor.submit(() -> process2(sheetLink));
+                }
+
+                executor.shutdown();
+                try {
+                    if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                        executor.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    executor.shutdownNow();
+                }
+            }
+
+            System.out.println("sheet is" + urlList);
+        }
     }
 
     public static void process1(String url) {
