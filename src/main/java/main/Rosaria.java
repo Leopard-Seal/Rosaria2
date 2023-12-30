@@ -18,11 +18,30 @@ public class Rosaria {
     public static List<String> urlList = new CopyOnWriteArrayList<>();
 
     public static final int THREADS = Runtime.getRuntime().availableProcessors() * 2;
+    public static void refresh(){
+        if(!companies.isEmpty()){
+            for (String s : companies){
+                companies.remove(s);
+            }
+        }
+        if(!essearch.isEmpty()){
+            for (String s : essearch){
+                essearch.remove(s);
+            }
+        }
+        if(!urlList.isEmpty()){
+            for (String s : urlList){
+                urlList.remove(s);
+            }
+        }
+    }
 
+    /**
+     * クローリングして、リンクをリストにまとめる
+     * @param index max 37 , min 2
+     */
     public void run(int index) {
-        System.out.println(THREADS);
-        int max = 37;
-        int min = 2;
+        refresh();
 
         String url0 = Fast.FIRST_VISIT_URL + index;
 
@@ -66,8 +85,6 @@ public class Rosaria {
                     executor.shutdownNow();
                 }
             }
-
-            System.out.println("sheet is" + urlList);
         }
     }
 

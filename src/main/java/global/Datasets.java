@@ -32,4 +32,10 @@ public final class Datasets {
             System.out.println(e.getMessage());
         }
     }
+
+    public static void refresh(){
+        for(Data data : datasets){
+            datasets.remove(data);
+        }
+    }
 }
