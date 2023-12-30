@@ -21,7 +21,7 @@ public final class Datasets {
             jsonArray.put(new JSONObject()
                     .put("title", data.title)
                     .put("tag" , new JSONArray(data.tag))
-                    .put("text" , data.text)
+                    .put("Q&A", new JSONObject(data.qAndA))
                     .put("url", data.url));
         }
 
