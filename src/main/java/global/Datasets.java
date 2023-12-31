@@ -34,8 +34,6 @@ public final class Datasets {
     }
 
     public static void refresh(){
-        for(Data data : datasets){
-            datasets.remove(data);
-        }
+        datasets.clear();
     }
 }

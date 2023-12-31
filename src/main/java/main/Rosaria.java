@@ -20,19 +20,13 @@ public class Rosaria {
     public static final int THREADS = Runtime.getRuntime().availableProcessors() * 2;
     public static void refresh(){
         if(!companies.isEmpty()){
-            for (String s : companies){
-                companies.remove(s);
-            }
+            essearch.clear();
         }
         if(!essearch.isEmpty()){
-            for (String s : essearch){
-                essearch.remove(s);
-            }
+            essearch.clear();
         }
         if(!urlList.isEmpty()){
-            for (String s : urlList){
-                urlList.remove(s);
-            }
+            urlList.clear();
         }
     }
 
